@@ -2,10 +2,10 @@
 Trying to revive Yahoo! Messenger. This project is my playground. I figured out some parts by "fuzzing" packets. I'll take the time to explain how I achieved this. I've been doing this from 2019, so the code isn't that clean(I didn't have a proper coding style at that time.)
 At some point in time, I'll re-write it in another language and make it better. 
 
-Features:
-IM Chat working
-Group Lists working
-Friend Requests are half-working(you can get friend requests, but they won't show up in your list until the next login; the friend added packet isn't implemented)
+# Features
+- IM Chat working
+- Group Lists working
+- Friend Requests are half-working(you can get friend requests, but they won't show up in your list until the next login; the friend added packet isn't implemented)
 
 There are many features to be implemented. The voice component is based on SIP with a minor modification.
 
