@@ -1,5 +1,5 @@
 # yumeko
-Trying to revive Yahoo! Messenger. This project is my playground. I figured out some parts by "fuzzing" packets. I'll take the time to explain how I achieved this. I've been doing this from 2019, so the code isn't that clean(I didn't have a proper coding style at that time.)
+Trying to revive Yahoo! Messenger. This project is my playground. I figured out some parts by "fuzzing" packets. I'll take the time to explain how I achieved this somewhere in the future. I've been doing this from 2019, so the code isn't that clean(I didn't have a proper coding style at that time.)
 At some point in time, I'll re-write it in another language and make it better. 
 
 # Features
