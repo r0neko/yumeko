@@ -1,0 +1,33 @@
+{
+  "name": "yumeko",
+  "version": "1.0.0",
+  "description": "Yahoo! Messenger Private Server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/r0neko/yumeko.git"
+  },
+  "keywords": [
+    "yahoo",
+    "messenger",
+    "private",
+    "server"
+  ],
+  "author": "r0neko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/r0neko/yumeko/issues"
+  },
+  "homepage": "https://github.com/r0neko/yumeko#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "concat-stream": "^2.0.0",
+    "express": "^4.17.2",
+    "sqlstring": "^2.3.2",
+    "sync-mysql": "^3.0.1",
+    "uuid": "^8.3.2"
+  }
+}
