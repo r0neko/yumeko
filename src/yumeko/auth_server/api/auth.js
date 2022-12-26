@@ -19,8 +19,8 @@ module.exports = async (req, res) => {
     userSession.owner_id = user.id;
     userSession.token = crypto.get_uuid();
     userSession.ip = req.ip;
-    userSession.createdAt = new Date();
-    userSession.updatedAt = new Date();
+    userSession.created_at = new Date();
+    userSession.updated_at = new Date();
 
     userSession.save();
 
