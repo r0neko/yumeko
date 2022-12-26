@@ -7,10 +7,11 @@ const StatusType = require("./consts/status_types");
 const StatusUtils = require("./utils/status");
 
 class UserSession {
-	constructor(identity, connection, session_id) {
+	constructor(identity, connection, session_id, token) {
 		this.identity = identity;
 		this.connection = connection;
 		this.session_id = session_id;
+		this.token = token;
 
 		this.status = {
 			type: StatusType.AVAILABLE,
@@ -21,15 +22,17 @@ class UserSession {
 		this.proto_ver = 16;
 	}
 
-	BuddyAddToGroup(who, group) {
-		let req = new PacketParameterCollection({
-			1: this.identity.name,
-			7: who.name,
-			65: group,
-			66: "0",
-		});
+	BuddyAddToGroup(who, group, pending = true) {
+		let req = new PacketParameterCollection();
 
-		this.connection.write(new Packet(this.proto_ver, 0, MessageType.ADD_BUDDY, 0, this.session_id, req.Serialize()).Serialize());
+		req.Add(new PacketParameter(65, group));
+		req.Add(new PacketParameter(7, who));
+		req.Add(new PacketParameter(223, pending ? "1" : "0"));
+		req.Add(new PacketParameter(241, "0"));
+		req.Add(new PacketParameter(1, this.identity.name));
+		req.Add(new PacketParameter(66, "0"));
+
+		this.connection.write(new Packet(this.proto_ver, 0, MessageType.ADD_BUDDY, 1, this.session_id, req.Serialize()).Serialize());
 	}
 
 	SendAddBuddyRequest(from, message = "") {
@@ -122,13 +125,26 @@ class UserSession {
 		);
 	}
 
+	SendPacket(command, status, params) {
+		this.connection.write(
+			new Packet(
+				this.proto_ver,
+				0,
+				command,
+				status,
+				this.session_id,
+				params.Serialize()
+			).Serialize()
+		);
+	}
+
 	HasMail(mails) {
 		this.connection.write(
 			new Packet(
 				this.proto_ver,
 				0,
 				MessageType.USER_HAS_MAIL,
-				2,
+				1,
 				this.session_id,
 				new PacketParameterCollection({
 					9: mails.length.toString(),
@@ -158,6 +174,18 @@ class UserSession {
 		}
 
 		this.connection.write(new Packet(this.proto_ver, 0, MessageType.MESSAGE, cached ? 6 : 1, this.session_id, p.Serialize()).Serialize());
+	}
+
+	SendSystemMessage(from, message, time = Date.now()) {
+		let p = new PacketParameterCollection({
+			4: from,
+			5: this.identity.name,
+			14: message,
+			15: (time / 1000).toString(),
+			159: "0",
+		});
+
+		this.connection.write(new Packet(this.proto_ver, 0, MessageType.SYSTEM_MESSAGE, 1, this.session_id, p.Serialize()).Serialize());
 	}
 }
 

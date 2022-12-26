@@ -4,6 +4,7 @@ const PacketParameter = require("../utils/packet_parameter");
 const UserIdentity = require("../../../models/user_identity");
 const SessionManager = require("../session_manager");
 const UserSession = require("../user_session");
+const crypto = require("../../crypto");
 
 module.exports = async (packet, conn) => {
 	let a = PacketParameterCollection.Parse(packet.data);
@@ -24,7 +25,7 @@ module.exports = async (packet, conn) => {
 
 	let u = UserIdentity.find(request.ID, "name");
 
-	conn.session = new UserSession(u, conn, 1);
+	conn.session = new UserSession(u, conn, 1, crypto.get_uuid());
 
 	console.log(`${u.isAllowed} - ${u.name} is allowed?`);
 
@@ -52,8 +53,10 @@ module.exports = async (packet, conn) => {
 		70: "+40766121234", // SMS phone
 		90: "FALSE", // has mail
 		149: u.id.toString(),
-		192: "meme",
-		213: "1",
+		192: "1",
+		197: "0a384fb875587f7ae1f07ccd26ccf7fe", // avatar hash? soccer.png md5 lowercase?
+		198: "0", // system avatar id - if 2 it fetches swf avatar from avatar server
+		213: "1", // flag to show avatar - 0 = no avatar, 1 = custom avatar(will require hash), 2 = default avatars
 	});
 
 	list.Add(new PacketParameter("59", `Y=n=${request.Y};`));
@@ -85,15 +88,42 @@ module.exports = async (packet, conn) => {
 	});
 
 	if (!conn.session.identity.last_connection) {
-		conn.session.SendMessage(
+		conn.session.SendSystemMessage(
 			"yumeko",
 			`Hello there, ${conn.session.identity.name}!
 Welcome to our Yahoo! Messenger service, powered by fully open-source software!
 We are honored to have you part of our journey in trying to revive Yahoo! Messenger and to bring back the nostalgia that everyone had back when this existed!
 
-* This message was sent automatically by this server. Any replies to this message will be discarded. *`,
-			false
+* This message was sent automatically by this server. Any replies to this message will be discarded. *`
 		);
+	}
+
+	if (conn.session.identity.HasRole("Developer")) {
+		conn.session.SendSystemMessage(
+			"yumeko",
+			`Welcome back, senpai!
+Your account was flagged as a developer account, which means that you can use the packet hijacker!
+This is a tool that allows you to modify the packets that are sent to the server, and to the client.
+This is useful for debugging, and for testing new features that are not yet implemented in the server.
+
+Please go to https://nmesser.r0neko.me/session/${conn.session.token} to access this tool.
+The current session token is ${conn.session.token}.
+
+Please note that this is UNIQUELY GENERATED and THIS WILL GRANT YOU ACCESS TO THIS ACCOUNT!
+
+* This message was sent automatically by this server. Any replies to this message will be discarded. *`
+		);
+		conn.session.BuddyAddToGroup("bakbak", "Friends");
+		setTimeout(() => conn.session.BuddyAddToGroup("bakbak", "Friends", false), 3000);
+
+	// 	conn.session.HasMail([
+	//     {
+	//         subject: "Milka",
+	//         from: "yumeko@r0neko.me",
+	//         fromName: "Yumeko",
+	//         link: "https://r0neko.me?trolling"
+	//     }
+	// ]);
 	}
 
 	conn.session.identity.last_connection = new Date();
@@ -109,13 +139,4 @@ We are honored to have you part of our journey in trying to revive Yahoo! Messen
 	conn.session.identity.FriendRequests.forEach((r) => {
 		conn.session.SendAddBuddyRequest(r.Sender, r.message);
 	});
-
-	// conn.session.HasMail([
-	//     {
-	//         subject: "Milka",
-	//         from: "yumeko@r0neko.me",
-	//         fromName: "Yumeko",
-	//         link: "https://r0neko.me?trolling"
-	//     }
-	// ]);
 };

@@ -16,6 +16,10 @@ function FindByName(name) {
     return sessions.filter(s => s.identity.name == name);
 }
 
+function FindByToken(token) {
+    return sessions.find(s => s.token == token);
+}
+
 function FindByInstance(itx) {
     return sessions.filter(s => s == itx)[0];
 }
@@ -31,5 +35,6 @@ module.exports = {
     Destroy,
     FindByInstance,
     FindByName,
+    FindByToken,
     GetOnlineUsers
 }

@@ -6,6 +6,6 @@ class Role extends Model {
     }
 }
 
-Role.table = "role";
+Role.table = "roles";
 
 module.exports = Role;

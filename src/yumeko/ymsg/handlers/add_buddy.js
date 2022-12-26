@@ -20,6 +20,7 @@ module.exports = (packet, conn) => {
     if(src && target) {
         // search for the session
         let session = SessionManager.FindByName(payload.target)
-        session.forEach(s => s.SendAddBuddyRequest(src, payload.msg)); 
+        session.forEach(s => s.SendAddBuddyRequest(src, payload.msg));
+        conn.session.BuddyAddToGroup(payload.target, "Friends", true);
     }
 };

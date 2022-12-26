@@ -44,14 +44,12 @@ class UserIdentity extends Model {
     }
 
     HasRole(role) {
-        if (this.role == null) return false;
-        console.log(this.getRole());
-
+        if (this.role_id == null) return false;
         return this.getRole().name == role;
     }
 
     getRole() {
-        return this.belongsTo(Role, "role", "id");
+        return this.belongsTo(Role, "role_id", "id");
     }
 
     get Friends() {
