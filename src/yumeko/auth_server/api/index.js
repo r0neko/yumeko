@@ -1,5 +1,6 @@
 const Router = require("express").Router;
 const APISession = require("../../../models/api_session");
+const cors = require('cors');
 
 let ApiRouter = new Router();
 
@@ -21,10 +22,12 @@ function requireAuth(req, res, next) {
     next();
 }
 
+ApiRouter.use(cors());
+
 ApiRouter.get("/", (req, res) => res.json({ status: "ok" }));
-// ApiRouter.post("/session/auth", require("./session_auth"));
 
 ApiRouter.post("/auth", require("./auth"));
+ApiRouter.get("/me", requireAuth, require("./me"));
 ApiRouter.get("/sessions", requireAuth, require("./sessions"));
 
 ApiRouter.post("/session/:token", requireAuth, require("./inject"));

@@ -3,7 +3,7 @@ const QueryBuilder = require("./query_builder");
 const logger = require("../logger");
 
 function ConstructModel(e, model) {
-  if(e == null) return null;
+  if (e == null) return null;
 
   let m = new model();
 
@@ -11,44 +11,48 @@ function ConstructModel(e, model) {
   m.constructor.rows = Object.keys(e);
 
   let protected = [];
-  if(model.protected != null) protected = model.protected; // do this to prevent lots of calls
+  if (model.protected != null) protected = model.protected; // do this to prevent lots of calls
 
   Object.keys(e).forEach(key => {
     let finalKey = key;
 
-    if((o = Object.getOwnPropertyDescriptor(m, key)) != null && o.get != null) {
+    if ((o = Object.getOwnPropertyDescriptor(m, key)) != null && o.get != null) {
       logger.Warning(`The main Model ${model.constructor.name} has already a getter called ${key}!`);
       logger.Warning(`${key} will be replaced with _${key}!`);
       finalKey = '_' + key;
     }
 
-    if(protected.filter(col => col == key).length >= 1)
+    if (protected.filter(col => col == key).length >= 1)
       return;
 
-    if(typeof e[key] == 'string' && e[key].indexOf("T") >= 10 && e[key][e[key].length - 1] == 'Z') {
+    if (typeof e[key] == 'string' && e[key].indexOf("T") >= 10 && e[key][e[key].length - 1] == 'Z') {
       logger.Warning(`${key} is a date!`);
       e[key] = new Date(e[key]);
     }
 
     m[finalKey] = e[key];
   });
-  
+
   return m;
 }
 
 function GetIDField(model) {
-  if(model.id != null) return "id";
+  if (model.id != null) return "id";
 
   let q = Object.keys(model);
 
-  for(let i = 0; i < q.length; i++)
-    if(q[i].toLowerCase().indexOf("id") >= 0)
+  for (let i = 0; i < q.length; i++)
+    if (q[i].toLowerCase().indexOf("id") >= 0)
       return q[i];
 
   return null;
 }
 
 class Model {
+  constructor() {
+    this.constructor.isNew = true;
+  }
+
   static all() {
     return DB.ExecuteQuery(new QueryBuilder(this.table).Select()).map(e => ConstructModel(e, this));
   }
@@ -66,19 +70,19 @@ class Model {
   }
 
   belongsTo(model, source = (new Error()).stack.split("\n")[2].split(" ")[6].toLowerCase() + "_id", column = "id") {
-    if(this[source] == null) throw new Error("Value can't be null!");
+    if (this[source] == null) throw new Error("Value can't be null!");
     return model.find(this[source], column);
   }
 
   hasMany(model, source = "id", column = (new Error()).stack.split("\n")[2].split(" ")[6].toLowerCase() + "_id") {
-    if(this[source] == null) throw new Error("Value can't be null!");
+    if (this[source] == null) throw new Error("Value can't be null!");
     return model.where(column, this[source]);
   }
 
   delete() {
     let field = GetIDField(this);
 
-    if(this[field] == null) {
+    if (this[field] == null) {
       throw new Error("No ID Field found!");
     };
 
@@ -86,19 +90,26 @@ class Model {
   }
 
   save(ignore = false) {
+    let _c = GetIDField(this);
     let doInsert = this.constructor.isNew;
     let query = new QueryBuilder(this.constructor.table);
     query.ForceInsert = ignore;
 
     let r = Object.keys(this);
-    if(this.constructor.rows != null) r = r.filter(a => this.constructor.rows.filter(b => a == b).length >= 1);
+    if (this.constructor.rows != null) r = r.filter(a => this.constructor.rows.filter(b => a == b).length >= 1);
+
+    console.log(this.constructor);
 
     (doInsert ? query.Insert : query.Update).bind(query)([...r.map(x => [x, this[x]])]);
-    if(!doInsert) query.Where("id", this.id);
+
+    if (!doInsert) {
+      let id = GetIDField(this);
+      if (id) query.Where(id, this[id]);
+    }
 
     DB.ExecuteQuery(query);
 
-    if(doInsert) this.id = DB.ExecuteQuery(new QueryBuilder(this.constructor.table).SelectLastInsertedID())[0].id;
+    if (doInsert) this.id = DB.ExecuteQuery(new QueryBuilder(null).SelectLastInsertedID()).id;
   }
 }
 

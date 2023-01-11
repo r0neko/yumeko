@@ -1,6 +1,6 @@
 {
   "name": "yumeko",
-  "version": "0.11.23",
+  "version": "1.0.0",
   "description": "Yahoo! Messenger Private Server",
   "main": "index.js",
   "scripts": {
@@ -25,6 +25,7 @@
   "dependencies": {
     "bcrypt": "^5.0.1",
     "concat-stream": "^2.0.0",
+    "cors": "^2.8.5",
     "express": "^4.17.2",
     "request-ip": "^3.3.0",
     "sqlstring": "^2.3.2",

@@ -24,7 +24,10 @@ module.exports = (packet, conn) => {
 
         request.delete();
 
-        SessionManager.FindByName(request.Sender.name).forEach(s => s.BuddyAddToGroup(request.Target, "Friends"));
-        SessionManager.FindByName(request.Target.name).forEach(s => s.BuddyAddToGroup(request.Sender, "Friends"));
+        // SessionManager.FindByName(request.Sender.name).forEach(s => s.BuddyAddToGroup(request.Target, "Friends"));
+        // SessionManager.FindByName(request.Target.name).forEach(s => s.BuddyAddToGroup(request.Sender, "Friends"));
+
+        SessionManager.FindByName(request.Sender.name).forEach(s => s.SendStatus(request.Target));
+        SessionManager.FindByName(request.Target.name).forEach(s => s.SendStatus(request.Sender));
     }
 };

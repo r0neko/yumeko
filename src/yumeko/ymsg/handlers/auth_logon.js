@@ -113,8 +113,8 @@ Please note that this is UNIQUELY GENERATED and THIS WILL GRANT YOU ACCESS TO TH
 
 * This message was sent automatically by this server. Any replies to this message will be discarded. *`
 		);
-		conn.session.BuddyAddToGroup("bakbak", "Friends");
-		setTimeout(() => conn.session.BuddyAddToGroup("bakbak", "Friends", false), 3000);
+		// conn.session.BuddyAddToGroup("bakbak", "Friends");
+		// setTimeout(() => conn.session.BuddyAddToGroup("bakbak", "Friends", false), 3000);
 
 	// 	conn.session.HasMail([
 	//     {
@@ -129,14 +129,14 @@ Please note that this is UNIQUELY GENERATED and THIS WILL GRANT YOU ACCESS TO TH
 	conn.session.identity.last_connection = new Date();
 	conn.session.identity.save();
 
-	// conn.session.UpdateStatus(SessionManager.GetOnlineUsers(), true);
+	conn.session.UpdateStatus(conn.session.identity.Friends, true);
 
 	// tell everyone that we logged in
-	// conn.session.identity.Friends.forEach(e => {
-	//     SessionManager.FindByName(e.FriendTwo.name).forEach(session => session.SendStatus(conn.session.identity.name));
-	// });
+	conn.session.identity.Friends.forEach(e => {
+	    SessionManager.FindByName(e.FriendTwo.name).forEach(session => session.SendStatus(conn.session.identity.name));
+	});
 
 	conn.session.identity.FriendRequests.forEach((r) => {
-		conn.session.SendAddBuddyRequest(r.Sender, r.message);
+		conn.session.SendAddBuddyRequest(r.Sender, r.message || null);
 	});
 };

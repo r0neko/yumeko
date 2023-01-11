@@ -27,6 +27,8 @@ module.exports = async (packet, conn) => {
         });
 
         msg.is_unread = session.length == 0;
+        msg.created_at = new Date();
+        msg.updated_at = new Date();
         msg.save();
         
         session.forEach(s => s.SendMessage(payload.source, payload.message));
